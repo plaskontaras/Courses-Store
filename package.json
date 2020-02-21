@@ -18,7 +18,10 @@
     "express": "^4.16.4",
     "express-handlebars": "^3.0.2",
     "express-session": "^1.17.0",
+    "handlebars": "^4.7.3",
+    "mixin-deep": "^2.0.1",
     "mongoose": "^5.9.1",
+    "set-value": "^3.0.1",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
