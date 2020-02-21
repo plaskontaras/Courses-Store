@@ -26,7 +26,7 @@ const User = require('./models/user');
 const varMiddleware = require('./middleware/variables')
 const userMiddleware = require('./middleware/user.js')
 
-const MONGODB_URI = 'mongodb+srv://taras:Mw1l6eMxzdO6J6ve@cluster0-vg0ap.mongodb.net/shop';// public link which access us to connect to DB
+const keys = require('./keys')
 const app = express()
 
 const hbs = exphbs.create({
@@ -36,7 +36,7 @@ const hbs = exphbs.create({
 
 const store = new MongoStore({
   collection: 'sessions',
-  uri: MONGODB_URI
+  uri: keys.MONGODB_URI
 
 })
 
@@ -62,7 +62,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // tune session
 app.use(session({
-  secret: 'some secret value',
+  secret: keys.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store
@@ -86,7 +86,7 @@ const PORT = process.env.PORT || 8080
 async function start() {
   try {
    
-    await mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false , useUnifiedTopology: true })
+    await mongoose.connect(keys.ONGODB_URI, { useNewUrlParser: true, useFindAndModify: false , useUnifiedTopology: true })
     const candidate = await User.findOne()
 
     // if (!candidate) {
