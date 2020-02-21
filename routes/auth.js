@@ -1,7 +1,11 @@
 const { Router } = require('express');
 const router = Router();
 const keys = require('../keys')
+
 const reqEmail = require('../emails/registration')
+const resetEmail = require('../emails/reset')
+
+const crypto = require('crypto');// we can use it without npm install
 
 const User = require('../models/user.js')
 
@@ -12,7 +16,7 @@ const sendgrid = require('nodemailer-sendgrid-transport')
 
 
 const transporter = nodemailer.createTransport(sendgrid({
-    auth: {api_key: keys.SENDGRID_API_KEY}
+    auth: { api_key: keys.SENDGRID_API_KEY }
 }))
 
 router.get('/login', async (req, res) => {
@@ -34,7 +38,7 @@ router.get('/logout', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        const { email, password} = req.body;
+        const { email, password } = req.body;
         const candidate = await User.findOne({ email })
 
         if (candidate) {
@@ -90,6 +94,41 @@ router.post('/register', async (req, res) => {
             res.redirect('/auth/login#login')
             await transporter.sendMail(reqEmail(email))
         }
+    } catch (e) {
+        console.log(e);
+    }
+})
+
+router.get('/reset', (req, res) => {
+    res.render('auth/reset', {
+        title: 'Забыли пароль?',
+        error: req.flash('error')
+    })
+})
+
+// here we create code for password reset
+router.post('/reset', (req, res) => {
+    try {
+        crypto.randomBytes(32, async (err, buffer) => {
+            if (err) {
+                req.flash('error', 'Что-то пошло не так. Повторите попытку позже...')
+                return res.redirect('/auth/reset')
+            }
+
+            const token = buffer.toString('hex')
+            const candidate = await User.findOne({ email: req.body.email })
+
+            if( candidate) {
+                candidate.resetToken = token;
+                candidate.resetTokenExp = Date.now() + 3600 * 1000;
+                await candidate.save()
+                await transporter.sendMail(resetEmail(candidate.email, token))
+                res.redirect('/auth/login#login')
+            } else {
+                req.flash('error', 'Такого email нет')
+                res.redirect('/auth/reset')
+            }
+        })
     } catch (e) {
         console.log(e);
     }
