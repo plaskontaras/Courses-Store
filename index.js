@@ -86,7 +86,7 @@ const PORT = process.env.PORT || 8080
 async function start() {
   try {
    
-    await mongoose.connect(keys.ONGODB_URI, { useNewUrlParser: true, useFindAndModify: false , useUnifiedTopology: true })
+    await mongoose.connect(keys.MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false , useUnifiedTopology: true })
     const candidate = await User.findOne()
 
     // if (!candidate) {
