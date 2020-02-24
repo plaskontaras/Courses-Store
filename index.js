@@ -25,6 +25,7 @@ const User = require('./models/user');
 //MIDDLEWARE
 const varMiddleware = require('./middleware/variables')
 const userMiddleware = require('./middleware/user.js')
+const errorHandler = require('./middleware/error') 
 
 const keys = require('./keys')
 const app = express()
@@ -67,6 +68,8 @@ app.use('/courses', coursesRoutes)
 app.use('/card', cardRoutes)
 app.use('/orders', ordersRoutes)
 app.use('/auth', authRoutes)
+
+app.use(errorHandler) // required to connect in the end of all .use()
 
 const PORT = process.env.PORT || 8080
 

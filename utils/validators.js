@@ -33,3 +33,9 @@ exports.registerValidators = [
         .isLength({ min: 3 }).withMessage('Имя должно быть не меньше 3 символов')
         .trim()
 ]
+
+exports.courseValidators = [
+    body('title').isLength({min: 3}).withMessage('Минимальная длина названия 3 символа'),
+    body('price').isNumeric().withMessage('Введите корректную цену'),
+    body('img', 'Введите корректный URL картинки').isURL(),
+]
