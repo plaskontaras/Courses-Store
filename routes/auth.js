@@ -35,7 +35,6 @@ router.get('/logout', async (req, res) => {
     })
 })
 
-
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -45,7 +44,6 @@ router.post('/login', async (req, res) => {
             const areSame = await bcrypt.compare(password, candidate.password);
 
             if (areSame) {
-                // const user = await User.findById('5e4d443ece861d23ecec4b9b');
                 req.session.user = candidate
                 req.session.isAuthenticated = true
                 req.session.save(err => {
@@ -118,7 +116,7 @@ router.post('/reset', (req, res) => {
             const token = buffer.toString('hex')
             const candidate = await User.findOne({ email: req.body.email })
 
-            if( candidate) {
+            if (candidate) {
                 candidate.resetToken = token;
                 candidate.resetTokenExp = Date.now() + 3600 * 1000;
                 await candidate.save()

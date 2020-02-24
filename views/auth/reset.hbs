@@ -5,6 +5,7 @@
         {{/if}}
         <h1>Забыли пароль?</h1>
         <form action="/auth/reset" method="POST">
+
             <div class="input-field">
                 <input id="email" name="email" type="email"
                     class="validate" required>
@@ -14,9 +15,9 @@
             </div>
 
             <input type="hidden" name="_csrf" value={{csrf}}>
-
             <button class="btn btn-primary"
                 type="submit">Сбросить</button>
+
         </form>
     </div>
 </div>

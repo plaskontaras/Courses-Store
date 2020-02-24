@@ -31,7 +31,8 @@ const app = express()
 
 const hbs = exphbs.create({
   defaultLayout: 'main',
-  extname: 'hbs'
+  extname: 'hbs',
+  helpers: require('./utils/hbs-helpers')
 })
 
 const store = new MongoStore({
@@ -44,19 +45,6 @@ app.engine('hbs', hbs.engine)
 app.set('view engine', 'hbs')
 app.set('views', 'views')
 
-//middlware
-// app.use( async (req, res, next) => {
-
-//   try {
-//     const user = await User.findById('5e4d443ece861d23ecec4b9b');
-//     req.user = user
-//     next()
-//   } catch (e) {
-//     console.log(e);
-//   }
-
-// }) // we made thi in auth post 
-
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({ extended: true }))
 
@@ -67,7 +55,6 @@ app.use(session({
   saveUninitialized: false,
   store
 }))
-
 
 app.use(csrf()) // token
 app.use(flash())
@@ -88,15 +75,6 @@ async function start() {
    
     await mongoose.connect(keys.MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false , useUnifiedTopology: true })
     const candidate = await User.findOne()
-
-    // if (!candidate) {
-    //   const user = new User({
-    //     email: 'tarasplaskon@gmail.com',
-    //     name: 'Taras',
-    //     cart: { items: [] }
-    //   })
-    //   await user.save();
-    // }
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`)
