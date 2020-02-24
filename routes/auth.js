@@ -7,6 +7,11 @@ const resetEmail = require('../emails/reset')
 
 const crypto = require('crypto');// we can use it without npm install
 
+// VALIDATORS
+const { validationResult } = require('express-validator/check')
+const { registerValidators } = require('../utils/validators')
+
+
 const User = require('../models/user.js')
 
 const bcrypt = require('bcryptjs');
@@ -66,32 +71,29 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.post('/register', async (req, res) => {
+router.post('/register', registerValidators, async (req, res) => {
     try {
-        const { email, password, repeat, name } = req.body;
-
+        const { email, password, name } = req.body;
         // here we have to verify is user already exist
-        const candidate = await User.findOne({ email })
+        const errors = validationResult(req)
 
-
-        if (candidate) {
-            req.flash('registerError', 'Пользователь с таким email уже существует')
-            res.redirect('/auth/login#register')
-        } else {
-
-            // crypt password when user register
-            const hashPassword = await bcrypt.hash(password, 10) // where 10 is a salt
-
-            const user = new User({
-                email,
-                password: hashPassword,
-                name,
-                cart: { items: [] }
-            })
-            await user.save()
-            res.redirect('/auth/login#login')
-            await transporter.sendMail(reqEmail(email))
+        if (!errors.isEmpty()) {
+            req.flash('registerError', errors.array()[0].msg)
+            return res.status(422).redirect('/auth/login#register');
         }
+        // crypt password when user register
+        const hashPassword = await bcrypt.hash(password, 10) // where 10 is a salt
+
+        const user = new User({
+            email,
+            password: hashPassword,
+            name,
+            cart: { items: [] }
+        })
+        await user.save()
+        res.redirect('/auth/login#login')
+        await transporter.sendMail(reqEmail(email))
+
     } catch (e) {
         console.log(e);
     }
