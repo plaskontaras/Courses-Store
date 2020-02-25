@@ -8,7 +8,7 @@ const resetEmail = require('../emails/reset')
 const crypto = require('crypto');// we can use it without npm install
 
 // VALIDATORS
-const { validationResult } = require('express-validator/check')
+const { validationResult } = require('express-validator')
 const { registerValidators } = require('../utils/validators')
 
 

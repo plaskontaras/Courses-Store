@@ -4,7 +4,7 @@ const path = require('path')
 const mongoose = require('mongoose'); //using mongoose we can connect to MongoDB
 const exphbs = require('express-handlebars')
 const csrf = require('csurf')
-const flash= require('connect-flash')
+const flash = require('connect-flash')
 
 //SESSION
 const session = require('express-session')
@@ -18,6 +18,7 @@ const addRoutes = require('./routes/add')
 const coursesRoutes = require('./routes/courses')
 const ordersRoutes = require('./routes/orders')
 const authRoutes = require('./routes/auth')
+const profileRoutes = require('./routes/profile')
 
 //MODELS
 const User = require('./models/user');
@@ -25,7 +26,8 @@ const User = require('./models/user');
 //MIDDLEWARE
 const varMiddleware = require('./middleware/variables')
 const userMiddleware = require('./middleware/user.js')
-const errorHandler = require('./middleware/error') 
+const errorHandler = require('./middleware/error')
+const fileMiddleware = require('./middleware/file')
 
 const keys = require('./keys')
 const app = express()
@@ -47,6 +49,12 @@ app.set('view engine', 'hbs')
 app.set('views', 'views')
 
 app.use(express.static(path.join(__dirname, 'public')))
+
+app.use('/images', express.static(path.join(__dirname, 'images')))
+
+console.log(path.join(__dirname, 'images'));
+
+
 app.use(express.urlencoded({ extended: true }))
 
 // tune session
@@ -56,6 +64,8 @@ app.use(session({
   saveUninitialized: false,
   store
 }))
+
+app.use(fileMiddleware.single('avatar'))// 'avatar' is a field where we will store image
 
 app.use(csrf()) // token
 app.use(flash())
@@ -68,6 +78,7 @@ app.use('/courses', coursesRoutes)
 app.use('/card', cardRoutes)
 app.use('/orders', ordersRoutes)
 app.use('/auth', authRoutes)
+app.use('/profile', profileRoutes)
 
 app.use(errorHandler) // required to connect in the end of all .use()
 
@@ -75,8 +86,8 @@ const PORT = process.env.PORT || 8080
 
 async function start() {
   try {
-   
-    await mongoose.connect(keys.MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false , useUnifiedTopology: true })
+
+    await mongoose.connect(keys.MONGODB_URI, { useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true })
     const candidate = await User.findOne()
 
     app.listen(PORT, () => {
