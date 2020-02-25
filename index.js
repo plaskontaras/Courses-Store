@@ -5,6 +5,8 @@ const mongoose = require('mongoose'); //using mongoose we can connect to MongoDB
 const exphbs = require('express-handlebars')
 const csrf = require('csurf')
 const flash = require('connect-flash')
+const helmet = require('helmet')
+const compression = require('compression')
 
 //SESSION
 const session = require('express-session')
@@ -69,6 +71,9 @@ app.use(fileMiddleware.single('avatar'))// 'avatar' is a field where we will sto
 
 app.use(csrf()) // token
 app.use(flash())
+app.use(helmet())
+app.use(compression())
+
 app.use(varMiddleware);
 app.use(userMiddleware);
 
